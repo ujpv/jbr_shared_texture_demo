@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        String filename = "/Users/Vladimir.Kharitonov/develop/jbr_shared_texture_demo/src/simple_shapes_example.png";
+        String filename = "data/simple_shapes_example.png";
         long ptr = NativeHelpers.loadTextureFromPng(filename);
         BufferedImage nativeImage = fromTexture(ptr);
         NativeHelpers.releaseTexture(ptr);
@@ -48,31 +48,25 @@ public class Main {
     }
 
     private static void displayImages(BufferedImage nativeImage, BufferedImage javaImage) {
-        // Create a JFrame to display the images
-        JFrame frame = new JFrame("Image Comparison");
+        JFrame frame = new JFrame("Rendered Texture");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        // Create a custom JPanel for painting the images
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
-                // Draw the two images side by side with labels
                 int spacing = 20; // Spacing between images and labels
 
-                // Draw native image
-                g.drawImage(nativeImage, spacing, spacing, null);
+                g.drawImage(javaImage, spacing, spacing, null);
                 g.setColor(Color.BLACK);
-                g.drawString("Native Image", spacing, nativeImage.getHeight() + spacing + 15);
+                g.drawString("Source Image", spacing, javaImage.getHeight() + spacing + 15);
 
-                // Draw Java image
-                g.drawImage(javaImage, nativeImage.getWidth() + 2 * spacing, spacing, null);
-                g.drawString("Java Image", nativeImage.getWidth() + 2 * spacing, javaImage.getHeight() + spacing + 15);
+                g.drawImage(nativeImage, javaImage.getWidth() + 2 * spacing, spacing, null);
+                g.drawString("BufferedImage from the texture", javaImage.getWidth() + 2 * spacing, nativeImage.getHeight() + spacing + 15);
             }
 
-            // Set preferred size of the panel to accommodate both images
             @Override
             public Dimension getPreferredSize() {
                 int spacing = 20;
@@ -82,7 +76,6 @@ public class Main {
             }
         };
 
-        // Add the panel to the frame
         frame.add(panel, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
