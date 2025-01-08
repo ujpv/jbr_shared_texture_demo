@@ -20,6 +20,7 @@ add_library(native_helpers SHARED
 find_library(FOUNDATION_FRAMEWORK Foundation)
 find_library(APPKIT_FRAMEWORK AppKit)
 find_library(METAL_FRAMEWORK Metal)
+find_library(METALKIT_FRAMEWORK MetalKit REQUIRED)
 
 # end Macos
 # Link JNI to the library
@@ -28,4 +29,5 @@ target_link_libraries(native_helpers
         ${FOUNDATION_FRAMEWORK}
         ${APPKIT_FRAMEWORK}
         ${METAL_FRAMEWORK}
+        ${METALKIT_FRAMEWORK}
 )

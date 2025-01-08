@@ -12,16 +12,11 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        String filename = "/Users/Vladimir.Kharitonov/develop/jbr_shared_texture_demo/src/Example.png";
-
-        // Load the image using the native method
+        String filename = "/Users/Vladimir.Kharitonov/develop/jbr_shared_texture_demo/src/simple_shapes_example.png";
         long ptr = NativeHelpers.loadTextureFromPng(filename);
         BufferedImage nativeImage = fromTexture(ptr);
-
-        // Release the native texture
         NativeHelpers.releaseTexture(ptr);
 
-        // Load the image using standard Java tools
         BufferedImage javaImage = null;
         try {
             javaImage = ImageIO.read(new File(filename));
@@ -30,7 +25,6 @@ public class Main {
             System.out.println("Failed to load image using standard Java tools.");
         }
 
-        // Create and display the window
         if (nativeImage != null && javaImage != null) {
             displayImages(nativeImage, javaImage);
         } else {
