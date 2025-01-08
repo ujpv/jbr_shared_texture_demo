@@ -1,5 +1,8 @@
 package org.example;
 
 public class NativeHelpers {
-    public native String sayHallo();
+    static {
+        System.loadLibrary("native_helpers");
+    }
+    public static native String sayHallo();
 }

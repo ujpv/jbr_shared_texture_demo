@@ -60,3 +60,7 @@ tasks.register("buildNative") {
 tasks.build {
     dependsOn("buildNative")
 }
+
+tasks.named("classes") {
+    dependsOn("buildNative")
+}

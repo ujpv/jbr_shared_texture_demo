@@ -7,10 +7,10 @@ find_package(JNI REQUIRED)
 include_directories(${JNI_INCLUDE_DIRS})
 
 # Add the native source file
-add_library(jni_helpers SHARED
+add_library(native_helpers SHARED
         org_example_NativeHelpers.cpp
         org_example_NativeHelpers.h
 )
 
 # Link JNI to the library
-target_link_libraries(jni_helpers ${JNI_LIBRARIES})
+target_link_libraries(native_helpers ${JNI_LIBRARIES})
