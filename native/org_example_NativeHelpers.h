@@ -15,6 +15,14 @@ extern "C" {
 JNIEXPORT jstring JNICALL Java_org_example_NativeHelpers_sayHallo
   (JNIEnv *, jclass);
 
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    loadTextureFromPng
+ * Signature: (Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_loadTextureFromPng
+  (JNIEnv *, jclass, jstring);
+
 #ifdef __cplusplus
 }
 #endif

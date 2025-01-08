@@ -14,4 +14,6 @@ public class NativeHelpers {
     }
 
     public static native String sayHallo();
+
+    public static native long loadTextureFromPng(String filename);
 }
