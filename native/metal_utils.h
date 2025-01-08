@@ -6,6 +6,7 @@
 
 namespace metal_utils {
     jlong loadMTLTextureFromPNG(const std::string &path);
+    void releaseMTLTexture(jlong);
 }
 
 #endif //NATIVE_METAL_UTILS_H

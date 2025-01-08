@@ -1,5 +1,7 @@
 package org.example;
 
+import java.awt.image.BufferedImage;
+
 public class NativeHelpers {
     private static final String nativeHelperLibName = "native_helpers";
 
@@ -16,4 +18,6 @@ public class NativeHelpers {
     public static native String sayHallo();
 
     public static native long loadTextureFromPng(String filename);
+    public static native void releaseTexture(long texture);
+    public static native BufferedImage textureToBufferedImage(long texture);
 }

@@ -63,4 +63,9 @@ namespace metal_utils {
 
         return reinterpret_cast<jlong>(texture);
     }
+
+    void releaseMTLTexture(jlong texturePtr)  {
+        id<MTLTexture> texture = reinterpret_cast<id<MTLTexture>>(texturePtr);
+        [texture release];
+    }
 }

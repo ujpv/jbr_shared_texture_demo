@@ -23,6 +23,22 @@ JNIEXPORT jstring JNICALL Java_org_example_NativeHelpers_sayHallo
 JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_loadTextureFromPng
   (JNIEnv *, jclass, jstring);
 
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    releaseTexture
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_example_NativeHelpers_releaseTexture
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    textureToBufferedImage
+ * Signature: (J)Ljava/awt/image/BufferedImage;
+ */
+JNIEXPORT jobject JNICALL Java_org_example_NativeHelpers_textureToBufferedImage
+  (JNIEnv *, jclass, jlong);
+
 #ifdef __cplusplus
 }
 #endif
