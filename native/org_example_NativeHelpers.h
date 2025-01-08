@@ -33,10 +33,18 @@ JNIEXPORT void JNICALL Java_org_example_NativeHelpers_releaseTexture
 
 /*
  * Class:     org_example_NativeHelpers
- * Method:    textureToBufferedImage
- * Signature: (J)Ljava/awt/image/BufferedImage;
+ * Method:    textureToByteArray
+ * Signature: (J)[B
  */
-JNIEXPORT jobject JNICALL Java_org_example_NativeHelpers_textureToBufferedImage
+JNIEXPORT jbyteArray JNICALL Java_org_example_NativeHelpers_textureToByteArray
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    getTextureSize
+ * Signature: (J)Ljava/awt/Dimension;
+ */
+JNIEXPORT jobject JNICALL Java_org_example_NativeHelpers_getTextureSize
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
