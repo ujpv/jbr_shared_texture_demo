@@ -174,4 +174,88 @@ namespace metal_utils {
         auto texture = reinterpret_cast<id<MTLTexture>>(ptr);
         return {texture.width, texture.height};
     }
+
+    jboolean wrapMTLTextureToVolatileImage(JNIEnv *env, jobject volatileImage, jlong mtlTexturePtr) {
+//        if (mtlTexturePtr == 0) {
+//            NSLog(@"Error: Invalid Metal texture pointer.");
+//            return JNI_FALSE; // Metal texture pointer is invalid
+//        }
+//
+//        id <MTLTexture> metalTexture = reinterpret_cast<id <MTLTexture>>(mtlTexturePtr);
+//        if (!metalTexture) {
+//            NSLog(@"Error: Metal texture pointer is null.");
+//            return JNI_FALSE;
+//        }
+//
+//        // Get the width, height, and pixel format of the Metal texture
+//        NSUInteger width = metalTexture.width;
+//        NSUInteger height = metalTexture.height;
+//
+//        if (metalTexture.pixelFormat != MTLPixelFormatBGRA8Unorm) {
+//            NSLog(@"Error: Unsupported Metal texture format (BGRA8Unorm only supported).");
+//            return JNI_FALSE;
+//        }
+//
+//        // Access the SunVolatileImage class from the given VolatileImage object
+//        jclass sunVolatileImageClass = env->GetObjectClass(volatileImage);
+//        if (!sunVolatileImageClass) {
+//            NSLog(@"Error: Failed to retrieve SunVolatileImage class.");
+//            return JNI_FALSE;
+//        }
+//
+//        // Retrieve the `volSurfaceManager` field from SunVolatileImage
+//        jfieldID volSurfaceManagerField = env->GetFieldID(sunVolatileImageClass, "volSurfaceManager",
+//                                                          "Lsun/awt/image/VolatileSurfaceManager;");
+//        if (!volSurfaceManagerField) {
+//            NSLog(@"Error: Failed to retrieve `volSurfaceManager` field.");
+//            return JNI_FALSE;
+//        }
+//
+//        jobject volSurfaceManager = env->GetObjectField(volatileImage, volSurfaceManagerField);
+//        if (!volSurfaceManager) {
+//            NSLog(@"Error: VolatileSurfaceManager retrieval failed.");
+//            return JNI_FALSE;
+//        }
+//
+//        // Access the `getPrimarySurfaceData()` method from VolatileSurfaceManager
+//        jclass volSurfaceManagerClass = env->GetObjectClass(volSurfaceManager);
+//        if (!volSurfaceManagerClass) {
+//            NSLog(@"Error: Failed to retrieve VolatileSurfaceManager class.");
+//            return JNI_FALSE;
+//        }
+//
+//        jmethodID getPrimarySurfaceDataMethod = env->GetMethodID(volSurfaceManagerClass, "getPrimarySurfaceData",
+//                                                                 "()Lsun/java2d/SurfaceData;");
+//        if (!getPrimarySurfaceDataMethod) {
+//            NSLog(@"Error: Failed to find getPrimarySurfaceData method.");
+//            return JNI_FALSE;
+//        }
+//
+//        // Call `getPrimarySurfaceData()` to get the current SurfaceData
+//        jobject primarySurfaceData = env->CallObjectMethod(volSurfaceManager, getPrimarySurfaceDataMethod);
+//        if (!primarySurfaceData) {
+//            NSLog(@"Error: Failed to retrieve primary SurfaceData.");
+//            return JNI_FALSE;
+//        }
+//
+//        // Replace the internal `nativeOps` or connect the Metal texture with SurfaceData
+//        jclass surfaceDataClass = env->GetObjectClass(primarySurfaceData);
+//        if (!surfaceDataClass) {
+//            NSLog(@"Error: Failed to retrieve SurfaceData class.");
+//            return JNI_FALSE;
+//        }
+//
+//        jfieldID nativeOpsFieldId = env->GetFieldID(surfaceDataClass, "pData", "J");
+//        if (!nativeOpsFieldId) {
+//            NSLog(@"Error: Failed to retrieve `nativeOps` field.");
+//            return JNI_FALSE;
+//        }
+//
+//        auto ops = reinterpret_cast<BMTLSDOps*>(env->GetLongField(primarySurfaceData, nativeOpsFieldId));
+//        ops->pTexture = metalTexture;
+//
+//        NSLog(@"Successfully linked Metal texture to SunVolatileImage.");
+//        return JNI_TRUE;
+          return JNI_FALSE;
+    }
 }

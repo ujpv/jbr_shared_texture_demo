@@ -1,7 +1,7 @@
 package org.example;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 
 public class NativeHelpers {
     private static final String nativeHelperLibName = "native_helpers";
@@ -22,4 +22,5 @@ public class NativeHelpers {
     public static native void releaseTexture(long texture);
     public static native byte[] textureToByteArray(long texture);
     public static native Dimension getTextureSize(long texture);
+    public static native boolean wrapToVolatileImage(VolatileImage image, long texture);
 }

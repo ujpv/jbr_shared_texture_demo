@@ -3,10 +3,7 @@ package org.example;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
+import java.awt.image.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -15,7 +12,7 @@ public class Main {
         String filename = "data/simple_shapes_example.png";
         long ptr = NativeHelpers.loadTextureFromPng(filename);
         BufferedImage nativeImage = fromTexture(ptr);
-        NativeHelpers.releaseTexture(ptr);
+        VolatileImage volatileImage = createVolatileImageFromTexture(ptr);
 
         BufferedImage javaImage = null;
         try {
@@ -25,8 +22,8 @@ public class Main {
             System.out.println("Failed to load image using standard Java tools.");
         }
 
-        if (nativeImage != null && javaImage != null) {
-            displayImages(nativeImage, javaImage);
+        if (nativeImage != null && javaImage != null && volatileImage != null) {
+            displayImages(nativeImage, javaImage, volatileImage);
         } else {
             System.out.println("One or both images could not be loaded.");
         }
@@ -47,7 +44,20 @@ public class Main {
         return image;
     }
 
-    private static void displayImages(BufferedImage nativeImage, BufferedImage javaImage) {
+    private static VolatileImage createVolatileImageFromTexture(long texture) {
+        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+        Dimension size = NativeHelpers.getTextureSize(texture);
+        VolatileImage image = gc.createCompatibleVolatileImage(size.width, size.height);
+        image.getGraphics().drawLine(0, 0, size.width, size.height);
+        image.getGraphics().drawLine(size.width, 0, 0, size.height);
+
+        if (image.loadTexture(texture)) {
+            return image;
+        }
+        return image;
+    }
+
+    private static void displayImages(BufferedImage nativeImage, BufferedImage javaImage, VolatileImage volatileImage) {
         JFrame frame = new JFrame("Rendered Texture");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
@@ -65,6 +75,9 @@ public class Main {
 
                 g.drawImage(nativeImage, javaImage.getWidth() + 2 * spacing, spacing, null);
                 g.drawString("BufferedImage from the texture", javaImage.getWidth() + 2 * spacing, nativeImage.getHeight() + spacing + 15);
+
+                g.drawImage(volatileImage, 2 * javaImage.getWidth() + 3 * spacing, spacing, null);
+                g.drawString("VolatileImage from the texture", 2 * javaImage.getWidth() + 3 * spacing, volatileImage.getHeight() + spacing + 15);
             }
 
             @Override

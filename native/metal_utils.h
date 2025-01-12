@@ -10,6 +10,7 @@ namespace metal_utils {
     void releaseMTLTexture(jlong);
     jbyteArray MTLTextureToByteArray(JNIEnv *env, jlong ptr);
     std::pair<int, int> getMTLTextureSize(jlong ptr);
+    jboolean wrapMTLTextureToVolatileImage(JNIEnv *env, jobject vi, jlong ptr);
 }
 
 #endif //NATIVE_METAL_UTILS_H
