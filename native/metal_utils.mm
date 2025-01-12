@@ -258,4 +258,84 @@ namespace metal_utils {
 //        return JNI_TRUE;
           return JNI_FALSE;
     }
+
+    jlong getTextureFromVolatileImage(JNIEnv *env, jobject vi) {
+        if (!vi) {
+            NSLog(@"Error: VolatileImage object is null.");
+            return 0;
+        }
+
+        jclass volatileImageClass = env->GetObjectClass(vi);
+        if (!volatileImageClass) {
+            NSLog(@"Error: Failed to retrieve VolatileImage class.");
+            return 0;
+        }
+
+        jfieldID volSurfaceManagerField = env->GetFieldID(volatileImageClass, "volSurfaceManager", "Lsun/awt/image/VolatileSurfaceManager;");
+        if (!volSurfaceManagerField) {
+            NSLog(@"Error: Failed to find volSurfaceManager field in VolatileImage.");
+            return 0;
+        }
+
+        jobject volSurfaceManager = env->GetObjectField(vi, volSurfaceManagerField);
+        if (!volSurfaceManager) {
+            NSLog(@"Error: volSurfaceManager is null.");
+            return 0;
+        }
+
+        // Step 2: Access the `getPrimarySurfaceData` method
+        jclass volSurfaceManagerClass = env->GetObjectClass(volSurfaceManager);
+        if (!volSurfaceManagerClass) {
+            NSLog(@"Error: Failed to retrieve VolatileSurfaceManager class.");
+            return 0;
+        }
+
+        jmethodID getPrimarySurfaceDataMethod = env->GetMethodID(volSurfaceManagerClass, "getPrimarySurfaceData", "()Lsun/java2d/SurfaceData;");
+        if (!getPrimarySurfaceDataMethod) {
+            NSLog(@"Error: Failed to retrieve getPrimarySurfaceData method in VolatileSurfaceManager.");
+            return 0;
+        }
+
+        jobject surfaceData = env->CallObjectMethod(volSurfaceManager, getPrimarySurfaceDataMethod);
+        if (!surfaceData) {
+            NSLog(@"Error: SurfaceData object retrieval failed.");
+            return 0;
+        }
+
+        // Step 3: Retrieve the `getNativeOps` method from SurfaceData
+        jclass surfaceDataClass = env->GetObjectClass(surfaceData);
+        if (!surfaceDataClass) {
+            NSLog(@"Error: Failed to retrieve SurfaceData class.");
+            return 0;
+        }
+
+        jmethodID getNativeOpsMethod = env->GetMethodID(surfaceDataClass, "getNativeOps", "()J");
+        if (!getNativeOpsMethod) {
+            NSLog(@"Error: Failed to retrieve getNativeOps method.");
+            return 0;
+        }
+
+        jlong nativeOpsHandle = env->CallLongMethod(surfaceData, getNativeOpsMethod);
+        if (nativeOpsHandle == 0) {
+            NSLog(@"Error: getNativeOps returned an invalid handle.");
+            return 0;
+        }
+
+        // Step 4: Use the Java `getMTLTexturePointer` method
+        // Call the SurfaceData's getMTLTexturePointer() method
+        jmethodID getMTLTexturePointerMethod = env->GetMethodID(surfaceDataClass, "getMTLTexturePointer", "(J)J");
+        if (!getMTLTexturePointerMethod) {
+            NSLog(@"Error: Failed to retrieve getMTLTexturePointer method from SurfaceData.");
+            return 0;
+        }
+
+        jlong texturePointer = env->CallLongMethod(surfaceData, getMTLTexturePointerMethod, nativeOpsHandle);
+        if (!texturePointer) {
+            NSLog(@"Error: getMTLTexturePointer returned an invalid Metal texture pointer.");
+            return 0;
+        }
+
+        NSLog(@"Successfully retrieved Metal texture pointer: %ld", texturePointer);
+        return texturePointer;
+    }
 }

@@ -50,6 +50,8 @@ public class Main {
         VolatileImage image = gc.createCompatibleVolatileImage(size.width, size.height);
         image.getGraphics().drawLine(0, 0, size.width, size.height);
         image.getGraphics().drawLine(size.width, 0, 0, size.height);
+        long textureFromVolatileImage = NativeHelpers.getTextureFromVolatileImage(image);
+        System.out.println("Created VolatileImage with texture: " + NativeHelpers.getTextureSize(textureFromVolatileImage));
 
         if (image.loadTexture(texture)) {
             return image;

@@ -11,6 +11,7 @@ namespace metal_utils {
     jbyteArray MTLTextureToByteArray(JNIEnv *env, jlong ptr);
     std::pair<int, int> getMTLTextureSize(jlong ptr);
     jboolean wrapMTLTextureToVolatileImage(JNIEnv *env, jobject vi, jlong ptr);
+    jlong getTextureFromVolatileImage(JNIEnv *env, jobject vi);
 }
 
 #endif //NATIVE_METAL_UTILS_H
