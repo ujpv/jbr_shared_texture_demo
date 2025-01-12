@@ -22,6 +22,5 @@ public class NativeHelpers {
     public static native void releaseTexture(long texture);
     public static native byte[] textureToByteArray(long texture);
     public static native Dimension getTextureSize(long texture);
-    public static native boolean wrapToVolatileImage(VolatileImage image, long texture);
     public static native long getTextureFromVolatileImage(VolatileImage image);
 }
