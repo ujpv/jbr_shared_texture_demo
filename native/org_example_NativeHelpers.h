@@ -63,6 +63,14 @@ JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_getTextureFromVolatileIma
 JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_scaleTexture
   (JNIEnv *, jclass, jlong, jlong, jdouble);
 
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    RenderQueueFlushAndInvokeNow
+ * Signature: (Ljava/lang/Runnable;)V
+ */
+JNIEXPORT void JNICALL Java_org_example_NativeHelpers_RenderQueueFlushAndInvokeNow
+  (JNIEnv *, jclass, jobject);
+
 #ifdef __cplusplus
 }
 #endif

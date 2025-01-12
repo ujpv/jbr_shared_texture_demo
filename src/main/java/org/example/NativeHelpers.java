@@ -24,4 +24,16 @@ public class NativeHelpers {
     public static native Dimension getTextureSize(long texture);
     public static native long getTextureFromVolatileImage(VolatileImage image);
     public static native boolean scaleTexture(long src, long dst, double scale);
+
+    /**
+     * Performs this code
+     *     MTLRenderQueue rq = MTLRenderQueue.getInstance();
+     *     rq.lock();
+     *     try {
+     *         rq.flushAndInvokeNow(r);
+     *     } finally {
+     *         rq.unlock();
+     *     }
+     */
+    public static native void RenderQueueFlushAndInvokeNow(Runnable r);
 }

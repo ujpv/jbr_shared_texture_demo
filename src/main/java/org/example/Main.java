@@ -7,8 +7,6 @@ import java.awt.image.*;
 import java.io.File;
 import java.io.IOException;
 
-import sun.java2d.metal.MTLRenderQueue;
-
 public class Main {
     public static void main(String[] args) {
         String filename = "data/simple_shapes_example.png";
@@ -52,18 +50,10 @@ public class Main {
         VolatileImage image = gc.createCompatibleVolatileImage(size.width, size.height);
         image.getGraphics().drawLine(0, 0, size.width, size.height);
         image.getGraphics().drawLine(size.width, 0, 0, size.height);
+        long viTexture = NativeHelpers.getTextureFromVolatileImage(image);
+        Dimension viTextureSize = NativeHelpers.getTextureSize(viTexture);
+        NativeHelpers.RenderQueueFlushAndInvokeNow(() -> NativeHelpers.scaleTexture(texture, viTexture, (double) size.width / viTextureSize.getWidth()));
 
-        MTLRenderQueue rq = MTLRenderQueue.getInstance();
-        rq.lock();
-        try {
-            rq.flushAndInvokeNow(() -> {
-                long viTexture = NativeHelpers.getTextureFromVolatileImage(image);
-                Dimension viTextureSize = NativeHelpers.getTextureSize(viTexture);
-                System.out.println(NativeHelpers.scaleTexture(texture, viTexture, (double) size.width / viTextureSize.getWidth() ));
-            });
-        } finally {
-            rq.unlock();
-        }
         return image;
     }
 
