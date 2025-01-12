@@ -40,3 +40,7 @@ extern "C" jobject Java_org_example_NativeHelpers_getTextureSize(JNIEnv *env, jc
 extern "C" jlong Java_org_example_NativeHelpers_getTextureFromVolatileImage(JNIEnv *env, jclass, jobject volatileImage) {
     return metal_utils::getTextureFromVolatileImage(env, volatileImage);
 }
+
+extern "C" jboolean Java_org_example_NativeHelpers_scaleTexture(JNIEnv *, jclass, jlong pSrc, jlong pDst, jdouble scale) {
+    return metal_utils::scaleTexture(pSrc, pDst, scale);
+}

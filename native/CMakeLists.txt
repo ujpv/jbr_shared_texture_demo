@@ -17,10 +17,11 @@ add_library(native_helpers SHARED
 )
 
 # Macos
-find_library(FOUNDATION_FRAMEWORK Foundation)
-find_library(APPKIT_FRAMEWORK AppKit)
-find_library(METAL_FRAMEWORK Metal)
+find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
+find_library(APPKIT_FRAMEWORK AppKit REQUIRED)
+find_library(METAL_FRAMEWORK Metal REQUIRED)
 find_library(METALKIT_FRAMEWORK MetalKit REQUIRED)
+find_library(MPS_LIBRARY MetalPerformanceShaders)
 
 # end Macos
 # Link JNI to the library
@@ -30,4 +31,5 @@ target_link_libraries(native_helpers
         ${APPKIT_FRAMEWORK}
         ${METAL_FRAMEWORK}
         ${METALKIT_FRAMEWORK}
+        ${MPS_LIBRARY}
 )

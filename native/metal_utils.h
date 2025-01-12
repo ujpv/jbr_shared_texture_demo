@@ -12,6 +12,7 @@ namespace metal_utils {
     std::pair<int, int> getMTLTextureSize(jlong ptr);
     jboolean wrapMTLTextureToVolatileImage(JNIEnv *env, jobject vi, jlong ptr);
     jlong getTextureFromVolatileImage(JNIEnv *env, jobject vi);
+    jboolean scaleTexture(jlong pSrc, jlong dDst, jdouble scale);
 }
 
 #endif //NATIVE_METAL_UTILS_H

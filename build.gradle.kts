@@ -42,7 +42,7 @@ tasks.register("configureNative") {
     doLast {
         println("Configuring native build using CMake...")
         exec {
-            commandLine = listOf("cmake", "-S", nativeDir, "-B", buildNativeDir)
+            commandLine = listOf("cmake", "-DCMAKE_BUILD_TYPE=Debug", "-S", nativeDir, "-B", buildNativeDir)
         }
     }
 }
@@ -52,7 +52,7 @@ tasks.register("buildNative") {
     doLast {
         println("Building native...")
         exec {
-            commandLine = listOf("cmake", "--build", buildNativeDir, "--config", "Release")
+            commandLine = listOf("cmake", "--build", buildNativeDir, "--config", "Debug")
         }
     }
 }

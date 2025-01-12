@@ -49,11 +49,19 @@ JNIEXPORT jobject JNICALL Java_org_example_NativeHelpers_getTextureSize
 
 /*
  * Class:     org_example_NativeHelpers
- * Method:    wrapToVolatileImage
- * Signature: (Ljava/awt/image/VolatileImage;J)Z
+ * Method:    getTextureFromVolatileImage
+ * Signature: (Ljava/awt/image/VolatileImage;)J
  */
-JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_wrapToVolatileImage
-  (JNIEnv *, jclass, jobject, jlong);
+JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_getTextureFromVolatileImage
+  (JNIEnv *, jclass, jobject);
+
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    scaleTexture
+ * Signature: (JJD)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_scaleTexture
+  (JNIEnv *, jclass, jlong, jlong, jdouble);
 
 #ifdef __cplusplus
 }

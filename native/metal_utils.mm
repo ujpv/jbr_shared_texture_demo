@@ -3,6 +3,7 @@
 #include <Foundation/Foundation.h>
 #include <Metal/Metal.h>
 #include <MetalKit//MetalKit.h>
+#include <MetalPerformanceShaders/MetalPerformanceShaders.h>
 #include <QuartzCore/CAMetalLayer.h>
 #include <AppKit/NSBitmapImageRep.h>
 
@@ -253,5 +254,96 @@ namespace metal_utils {
 
         NSLog(@"Successfully retrieved Metal texture pointer: %ld", texturePointer);
         return texturePointer;
+    }
+
+    jboolean scaleTexture(jlong pSrc, jlong pDst, jdouble scale) {
+        // Validate inputs
+        if (!pSrc || !pDst || scale <= 0.0) {
+            NSLog(@"Error: Invalid inputs. pSrc: %p, pDst: %p, scale: %f", (void *)pSrc, (void *)pDst, (float)scale);
+            return JNI_FALSE;
+        }
+
+        // Cast inputs to Metal textures
+        id<MTLTexture> srcTexture = (id<MTLTexture>)pSrc;
+        id<MTLTexture> dstTexture = (id<MTLTexture>)pDst;
+
+        // Ensure valid textures and device compatibility
+        if (!srcTexture || !dstTexture || srcTexture.device != dstTexture.device) {
+            NSLog(@"Error: Invalid Metal textures or incompatible devices.");
+            return JNI_FALSE;
+        }
+
+        // Get the Metal device
+        id<MTLDevice> device = srcTexture.device;
+        if (!device) {
+            NSLog(@"Error: Failed to retrieve Metal device.");
+            return JNI_FALSE;
+        }
+
+        // Compute the target dimensions
+        NSUInteger scaledWidth = (NSUInteger)(srcTexture.width * scale);
+        NSUInteger scaledHeight = (NSUInteger)(srcTexture.height * scale);
+
+        // Ensure the destination texture is large enough to hold the scaled content
+        if (scaledWidth > dstTexture.width || scaledHeight > dstTexture.height) {
+            NSLog(@"Error: Destination texture size is too small for the scaled result.");
+            return JNI_FALSE;
+        }
+
+        // Create a command queue
+        id<MTLCommandQueue> commandQueue = [device newCommandQueue];
+        if (!commandQueue) {
+            NSLog(@"Error: Failed to create Metal command queue.");
+            return JNI_FALSE;
+        }
+
+        // Create a command buffer
+        id<MTLCommandBuffer> commandBuffer = commandQueue.commandBuffer;
+        if (!commandBuffer) {
+            NSLog(@"Error: Failed to create Metal command buffer.");
+            [commandQueue release];
+            return JNI_FALSE;
+        }
+
+        // Create the MPSImageLanczosScale filter
+        MPSImageLanczosScale *lanczosFilter = [[MPSImageLanczosScale alloc] initWithDevice:device];
+        if (!lanczosFilter) {
+            NSLog(@"Error: Failed to create MPSImageLanczosScale filter.");
+            return JNI_FALSE;
+        }
+
+        // Define the scaling transformation (reverse for MPSImageLanczosScale)
+        MPSScaleTransform scaleTransform = {
+                .scaleX = 1.0 / scale, // The scaling factor for x (input is inverted for reverse lookup)
+                .scaleY = 1.0 / scale, // The scaling factor for y
+                .translateX = 0.0,     // Used if offsets are desired (0 for no translation)
+                .translateY = 0.0
+        };
+
+        // Set the scaling transformation
+        lanczosFilter.scaleTransform = &scaleTransform;
+
+        // Apply the Lanczos scale filter
+        [lanczosFilter encodeToCommandBuffer:commandBuffer
+                               sourceTexture:srcTexture
+                          destinationTexture:dstTexture];
+
+        // Commit and wait for the command buffer to complete
+        [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
+
+        // Check for errors during execution
+        if (commandBuffer.error) {
+            NSLog(@"Error: Command buffer failed with error: %@", commandBuffer.error);
+            return JNI_FALSE;
+        }
+
+        NSLog(@"Successfully scaled the texture to %lu x %lu.", scaledWidth, scaledHeight);
+
+        // Clean up
+        [lanczosFilter release];
+        [commandQueue release];
+
+        return JNI_TRUE;
     }
 }
