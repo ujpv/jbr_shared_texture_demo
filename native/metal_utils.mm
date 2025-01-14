@@ -314,9 +314,9 @@ namespace metal_utils {
 
         // Define the scaling transformation (reverse for MPSImageLanczosScale)
         MPSScaleTransform scaleTransform = {
-                .scaleX = 1.0 / scale, // The scaling factor for x (input is inverted for reverse lookup)
-                .scaleY = 1.0 / scale, // The scaling factor for y
-                .translateX = 0.0,     // Used if offsets are desired (0 for no translation)
+                .scaleX = scale,
+                .scaleY = scale,
+                .translateX = 0.0,
                 .translateY = 0.0
         };
 

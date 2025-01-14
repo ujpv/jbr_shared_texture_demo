@@ -8,25 +8,30 @@ import java.io.File;
 import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String filename = "data/simple_shapes_example.png";
+
+        JComponent originalImage =new ImagePanel(ImageIO.read(new File(filename)));
+
         long ptr = NativeHelpers.loadTextureFromPng(filename);
-        BufferedImage nativeImage = fromTexture(ptr);
-        VolatileImage volatileImage = createVolatileImageFromTexture(ptr);
+        JComponent bufferedImage = new ImagePanel(fromTexture(ptr));
 
-        BufferedImage javaImage = null;
-        try {
-            javaImage = ImageIO.read(new File(filename));
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Failed to load image using standard Java tools.");
-        }
+        VolatileImagePanel volatileImage = new VolatileImagePanel();
+        volatileImage.setTexture(ptr);
 
-        if (nativeImage != null && javaImage != null && volatileImage != null) {
-            displayImages(nativeImage, javaImage, volatileImage);
-        } else {
-            System.out.println("One or both images could not be loaded.");
-        }
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(originalImage);
+        panel.add(Box.createHorizontalStrut(10));
+        panel.add(bufferedImage);
+        panel.add(Box.createHorizontalStrut(10));
+        panel.add(volatileImage);
+
+        JFrame frame = new JFrame("Texture Renderer");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(panel);
+        frame.pack();
+        frame.setVisible(true);
     }
 
     private static BufferedImage fromTexture(long texture) {
@@ -44,53 +49,30 @@ public class Main {
         return image;
     }
 
-    private static VolatileImage createVolatileImageFromTexture(long texture) {
-        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-        Dimension size = NativeHelpers.getTextureSize(texture);
-        VolatileImage image = gc.createCompatibleVolatileImage(size.width, size.height);
-        image.getGraphics().drawLine(0, 0, size.width, size.height);
-        image.getGraphics().drawLine(size.width, 0, 0, size.height);
-        long viTexture = NativeHelpers.getTextureFromVolatileImage(image);
-        Dimension viTextureSize = NativeHelpers.getTextureSize(viTexture);
-        NativeHelpers.RenderQueueFlushAndInvokeNow(() -> NativeHelpers.scaleTexture(texture, viTexture, (double) size.width / viTextureSize.getWidth()));
-
-        return image;
-    }
-
-    private static void displayImages(BufferedImage nativeImage, BufferedImage javaImage, VolatileImage volatileImage) {
-        JFrame frame = new JFrame("Rendered Texture");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-
-        JPanel panel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-
-                int spacing = 20; // Spacing between images and labels
-
-                g.drawImage(javaImage, spacing, spacing, null);
-                g.setColor(Color.BLACK);
-                g.drawString("Source Image", spacing, javaImage.getHeight() + spacing + 15);
-
-                g.drawImage(nativeImage, javaImage.getWidth() + 2 * spacing, spacing, null);
-                g.drawString("BufferedImage from the texture", javaImage.getWidth() + 2 * spacing, nativeImage.getHeight() + spacing + 15);
-
-                g.drawImage(volatileImage, 2 * javaImage.getWidth() + 3 * spacing, spacing, null);
-                g.drawString("VolatileImage from the texture", 2 * javaImage.getWidth() + 3 * spacing, volatileImage.getHeight() + spacing + 15);
+    private static class ImagePanel extends JPanel {
+        private final Image myImage;
+        ImagePanel(Image image) {
+            if (image == null) {
+                throw new IllegalArgumentException("Image must not be null");
             }
+            myImage = image;
+            setSize(image.getWidth(null), image.getHeight(null));
+        }
 
-            @Override
-            public Dimension getPreferredSize() {
-                int spacing = 20;
-                int width = nativeImage.getWidth() + javaImage.getWidth() + 3 * spacing;
-                int height = Math.max(nativeImage.getHeight(), javaImage.getHeight()) + 2 * spacing + 15;
-                return new Dimension(width, height);
-            }
-        };
+        @Override
+        public Dimension getSize() {
+            return new Dimension(myImage.getWidth(null), myImage.getHeight(null));
+        }
 
-        frame.add(panel, BorderLayout.CENTER);
-        frame.pack();
-        frame.setVisible(true);
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(myImage.getWidth(null), myImage.getHeight(null));
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.drawImage(myImage, 0, 0, this);
+        }
     }
 }
