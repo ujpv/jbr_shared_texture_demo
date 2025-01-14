@@ -297,6 +297,43 @@ namespace metal_utils {
             return JNI_FALSE;
         }
 
+//        id<MTLCommandBuffer> clearCommandBuffer = [commandQueue commandBuffer];
+//        if (!clearCommandBuffer) {
+//            NSLog(@"Error: Failed to create Metal command buffer for clearing the texture.");
+//            [commandQueue release];
+//            return JNI_FALSE;
+//        }
+//
+//        // Define a render pass descriptor to clear the destination texture
+//        MTLRenderPassDescriptor *passDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
+//        passDescriptor.colorAttachments[0].texture = dstTexture;
+//        passDescriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
+//        passDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
+//        passDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 0.0); // Transparent color
+//
+//        id<MTLRenderCommandEncoder> encoder = [clearCommandBuffer renderCommandEncoderWithDescriptor:passDescriptor];
+//        if (!encoder) {
+//            NSLog(@"Error: Failed to create render command encoder for clearing pDst.");
+//            [clearCommandBuffer release];
+//            [commandQueue release];
+//            return JNI_FALSE;
+//        }
+//        [encoder endEncoding];
+//
+//        // Commit and wait for the clear operation to complete
+//        [clearCommandBuffer commit];
+//        [clearCommandBuffer waitUntilCompleted];
+//
+//        if (clearCommandBuffer.error) {
+//            NSLog(@"Error: Command buffer for clearing texture failed with error: %@", clearCommandBuffer.error);
+//            [commandQueue release];
+//            return JNI_FALSE;
+//        }
+//
+//        // --------------------------------------------------
+//        // Proceed with scaling operation
+//        // --------------------------------------------------
+
         // Create a command buffer
         id<MTLCommandBuffer> commandBuffer = commandQueue.commandBuffer;
         if (!commandBuffer) {

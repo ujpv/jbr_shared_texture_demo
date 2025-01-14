@@ -12,7 +12,7 @@ public class VolatileImagePanel extends JPanel {
     private long myTexture;
 
     private VolatileImage createVolatileImage() {
-        return getGraphicsConfiguration().createCompatibleVolatileImage(mySize.width, mySize.height);
+        return getGraphicsConfiguration().createCompatibleVolatileImage(mySize.width, mySize.height, Transparency.TRANSLUCENT);
     }
 
     public void setTexture(long myTexture) {
@@ -31,6 +31,15 @@ public class VolatileImagePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (mySize != null) {
+            int squareSize = Math.min(mySize.width, mySize.height) / 8;
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    g.setColor((row + col) % 2 == 0 ? new Color(0, 0, 0, 0) : Color.BLACK);
+                    g.fillRect(col * squareSize, row * squareSize, squareSize, squareSize);
+                }
+            }
+        }
         if (mySize == null) {
             g.setColor(Color.RED);
             g.fillRect(0, 0, getWidth(), getHeight());
@@ -67,6 +76,7 @@ public class VolatileImagePanel extends JPanel {
 
     private void renderToVolatileImage() {
         if (myTexture != 0) {
+            clearVolatileImage();
             long viTexture = NativeHelpers.getTextureFromVolatileImage(myVolatileImage);
             Dimension viSize = NativeHelpers.getTextureSize(NativeHelpers.getTextureFromVolatileImage(myVolatileImage));
             AtomicBoolean result = new AtomicBoolean(false);
@@ -76,4 +86,13 @@ public class VolatileImagePanel extends JPanel {
             assert result.get();
         }
     }
+
+    private void clearVolatileImage() {
+        myVolatileImage.validate(getGraphicsConfiguration());
+        Graphics2D g = (Graphics2D) myVolatileImage.getGraphics();
+        g.setComposite(AlphaComposite.Clear); // Ensure full transparency
+        g.fillRect(0, 0, myVolatileImage.getWidth(), myVolatileImage.getHeight());
+        g.dispose();
+    }
+
 }
