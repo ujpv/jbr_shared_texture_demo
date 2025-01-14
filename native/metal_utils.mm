@@ -257,109 +257,63 @@ namespace metal_utils {
     }
 
     jboolean scaleTexture(jlong pSrc, jlong pDst, jdouble scale) {
-        // Validate inputs
         if (!pSrc || !pDst || scale <= 0.0) {
-            NSLog(@"Error: Invalid inputs. pSrc: %p, pDst: %p, scale: %f", (void *)pSrc, (void *)pDst, (float)scale);
+            NSLog(@"Error: Invalid inputs.");
             return JNI_FALSE;
         }
 
-        // Cast inputs to Metal textures
-        id<MTLTexture> srcTexture = (id<MTLTexture>)pSrc;
-        id<MTLTexture> dstTexture = (id<MTLTexture>)pDst;
+        id <MTLTexture> srcTexture = (id <MTLTexture>) pSrc;
+        id <MTLTexture> dstTexture = (id <MTLTexture>) pDst;
 
-        // Ensure valid textures and device compatibility
         if (!srcTexture || !dstTexture || srcTexture.device != dstTexture.device) {
-            NSLog(@"Error: Invalid Metal textures or incompatible devices.");
+            NSLog(@"Error: Invalid Metal textures.");
             return JNI_FALSE;
         }
 
-        // Get the Metal device
-        id<MTLDevice> device = srcTexture.device;
-        if (!device) {
-            NSLog(@"Error: Failed to retrieve Metal device.");
-            return JNI_FALSE;
-        }
-
-        // Compute the target dimensions
-        NSUInteger scaledWidth = (NSUInteger)(srcTexture.width * scale);
-        NSUInteger scaledHeight = (NSUInteger)(srcTexture.height * scale);
-
-        // Ensure the destination texture is large enough to hold the scaled content
+        NSUInteger scaledWidth = static_cast<NSUInteger>(srcTexture.width * scale);
+        NSUInteger scaledHeight = static_cast<NSUInteger>(srcTexture.height * scale);
         if (scaledWidth > dstTexture.width || scaledHeight > dstTexture.height) {
-            NSLog(@"Error: Destination texture size is too small for the scaled result.");
+            NSLog(@"Error: Destination texture is too small.");
             return JNI_FALSE;
         }
 
-        // Create a command queue
-        id<MTLCommandQueue> commandQueue = [device newCommandQueue];
-        if (!commandQueue) {
-            NSLog(@"Error: Failed to create Metal command queue.");
-            return JNI_FALSE;
+
+        @autoreleasepool {
+            id <MTLCommandQueue> commandQueue = [[srcTexture.device newCommandQueue] autorelease];
+            if (!commandQueue) {
+                NSLog(@"Failed to create Metal command queue.");
+                return JNI_FALSE;
+            }
+
+            id <MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+            if (!commandBuffer) {
+                return JNI_FALSE;
+            }
+
+            MTLRenderPassDescriptor *descriptor = [MTLRenderPassDescriptor renderPassDescriptor];
+            descriptor.colorAttachments[0].texture = dstTexture;
+            descriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
+            descriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
+            descriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 0.0);
+
+            id <MTLRenderCommandEncoder> encoder = [commandBuffer renderCommandEncoderWithDescriptor:descriptor];
+            [encoder endEncoding];
+
+            MPSImageLanczosScale *lanczos = [[[MPSImageLanczosScale alloc] initWithDevice:srcTexture.device] autorelease];
+            MPSScaleTransform transform = {.scaleX = scale, .scaleY = scale};
+            lanczos.scaleTransform = &transform;
+
+            [lanczos encodeToCommandBuffer:commandBuffer sourceTexture:srcTexture destinationTexture:dstTexture];
+
+            [commandBuffer commit];
+            [commandBuffer waitUntilCompleted];
+
+            if (commandBuffer.error) {
+                NSLog(@"Error: Command buffer failed with error: %@", commandBuffer.error);
+                return JNI_FALSE;
+            }
         }
 
-        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
-        if (!commandBuffer) {
-            NSLog(@"Error: Failed to create Metal command buffer.");
-            [commandQueue release];
-            return JNI_FALSE;
-        }
-
-        // --------------------------------------------------
-        // Step 1: Clear the destination texture
-        // --------------------------------------------------
-        MTLRenderPassDescriptor *passDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
-        passDescriptor.colorAttachments[0].texture = dstTexture;
-        passDescriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
-        passDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
-        passDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 0.0); // Transparent color
-
-        id<MTLRenderCommandEncoder> encoder = [commandBuffer renderCommandEncoderWithDescriptor:passDescriptor];
-        if (!encoder) {
-            NSLog(@"Error: Failed to create render command encoder for clearing pDst.");
-            [commandQueue release];
-            return JNI_FALSE;
-        }
-        [encoder endEncoding];
-
-        // --------------------------------------------------
-        // Step 2: Scale the source texture into the destination texture
-        // --------------------------------------------------
-        MPSImageLanczosScale *lanczosFilter = [[MPSImageLanczosScale alloc] initWithDevice:device];
-        if (!lanczosFilter) {
-            NSLog(@"Error: Failed to create MPSImageLanczosScale filter.");
-            return JNI_FALSE;
-        }
-
-        MPSScaleTransform scaleTransform = {
-                .scaleX = scale,
-                .scaleY = scale,
-                .translateX = 0.0,
-                .translateY = 0.0
-        };
-        lanczosFilter.scaleTransform = &scaleTransform;
-
-        [lanczosFilter encodeToCommandBuffer:commandBuffer
-                               sourceTexture:srcTexture
-                          destinationTexture:dstTexture];
-
-        // --------------------------------------------------
-        // Commit and execute the command buffer
-        // --------------------------------------------------
-        [commandBuffer commit];
-        [commandBuffer waitUntilCompleted];
-
-        if (commandBuffer.error) {
-            NSLog(@"Error: Command buffer failed with error: %@", commandBuffer.error);
-            [lanczosFilter release];
-            [commandQueue release];
-            return JNI_FALSE;
-        }
-
-        NSLog(@"Successfully scaled the texture to %lu x %lu.", scaledWidth, scaledHeight);
-
-        // Clean up
-        [lanczosFilter release];
-        [commandQueue release];
 
         return JNI_TRUE;
     }
