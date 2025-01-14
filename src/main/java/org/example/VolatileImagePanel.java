@@ -76,7 +76,6 @@ public class VolatileImagePanel extends JPanel {
 
     private void renderToVolatileImage() {
         if (myTexture != 0) {
-            clearVolatileImage();
             long viTexture = NativeHelpers.getTextureFromVolatileImage(myVolatileImage);
             Dimension viSize = NativeHelpers.getTextureSize(NativeHelpers.getTextureFromVolatileImage(myVolatileImage));
             AtomicBoolean result = new AtomicBoolean(false);
@@ -86,13 +85,4 @@ public class VolatileImagePanel extends JPanel {
             assert result.get();
         }
     }
-
-    private void clearVolatileImage() {
-        myVolatileImage.validate(getGraphicsConfiguration());
-        Graphics2D g = (Graphics2D) myVolatileImage.getGraphics();
-        g.setComposite(AlphaComposite.Clear); // Ensure full transparency
-        g.fillRect(0, 0, myVolatileImage.getWidth(), myVolatileImage.getHeight());
-        g.dispose();
-    }
-
 }

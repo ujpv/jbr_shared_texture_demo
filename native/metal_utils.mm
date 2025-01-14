@@ -297,81 +297,61 @@ namespace metal_utils {
             return JNI_FALSE;
         }
 
-//        id<MTLCommandBuffer> clearCommandBuffer = [commandQueue commandBuffer];
-//        if (!clearCommandBuffer) {
-//            NSLog(@"Error: Failed to create Metal command buffer for clearing the texture.");
-//            [commandQueue release];
-//            return JNI_FALSE;
-//        }
-//
-//        // Define a render pass descriptor to clear the destination texture
-//        MTLRenderPassDescriptor *passDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
-//        passDescriptor.colorAttachments[0].texture = dstTexture;
-//        passDescriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
-//        passDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
-//        passDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 0.0); // Transparent color
-//
-//        id<MTLRenderCommandEncoder> encoder = [clearCommandBuffer renderCommandEncoderWithDescriptor:passDescriptor];
-//        if (!encoder) {
-//            NSLog(@"Error: Failed to create render command encoder for clearing pDst.");
-//            [clearCommandBuffer release];
-//            [commandQueue release];
-//            return JNI_FALSE;
-//        }
-//        [encoder endEncoding];
-//
-//        // Commit and wait for the clear operation to complete
-//        [clearCommandBuffer commit];
-//        [clearCommandBuffer waitUntilCompleted];
-//
-//        if (clearCommandBuffer.error) {
-//            NSLog(@"Error: Command buffer for clearing texture failed with error: %@", clearCommandBuffer.error);
-//            [commandQueue release];
-//            return JNI_FALSE;
-//        }
-//
-//        // --------------------------------------------------
-//        // Proceed with scaling operation
-//        // --------------------------------------------------
-
-        // Create a command buffer
-        id<MTLCommandBuffer> commandBuffer = commandQueue.commandBuffer;
+        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
         if (!commandBuffer) {
             NSLog(@"Error: Failed to create Metal command buffer.");
             [commandQueue release];
             return JNI_FALSE;
         }
 
-        // Create the MPSImageLanczosScale filter
+        // --------------------------------------------------
+        // Step 1: Clear the destination texture
+        // --------------------------------------------------
+        MTLRenderPassDescriptor *passDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
+        passDescriptor.colorAttachments[0].texture = dstTexture;
+        passDescriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
+        passDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
+        passDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 0.0); // Transparent color
+
+        id<MTLRenderCommandEncoder> encoder = [commandBuffer renderCommandEncoderWithDescriptor:passDescriptor];
+        if (!encoder) {
+            NSLog(@"Error: Failed to create render command encoder for clearing pDst.");
+            [commandQueue release];
+            return JNI_FALSE;
+        }
+        [encoder endEncoding];
+
+        // --------------------------------------------------
+        // Step 2: Scale the source texture into the destination texture
+        // --------------------------------------------------
         MPSImageLanczosScale *lanczosFilter = [[MPSImageLanczosScale alloc] initWithDevice:device];
         if (!lanczosFilter) {
             NSLog(@"Error: Failed to create MPSImageLanczosScale filter.");
             return JNI_FALSE;
         }
 
-        // Define the scaling transformation (reverse for MPSImageLanczosScale)
         MPSScaleTransform scaleTransform = {
                 .scaleX = scale,
                 .scaleY = scale,
                 .translateX = 0.0,
                 .translateY = 0.0
         };
-
-        // Set the scaling transformation
         lanczosFilter.scaleTransform = &scaleTransform;
 
-        // Apply the Lanczos scale filter
         [lanczosFilter encodeToCommandBuffer:commandBuffer
                                sourceTexture:srcTexture
                           destinationTexture:dstTexture];
 
-        // Commit and wait for the command buffer to complete
+        // --------------------------------------------------
+        // Commit and execute the command buffer
+        // --------------------------------------------------
         [commandBuffer commit];
         [commandBuffer waitUntilCompleted];
 
-        // Check for errors during execution
         if (commandBuffer.error) {
             NSLog(@"Error: Command buffer failed with error: %@", commandBuffer.error);
+            [lanczosFilter release];
+            [commandQueue release];
             return JNI_FALSE;
         }
 
