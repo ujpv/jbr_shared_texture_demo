@@ -12,13 +12,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("com.jetbrains:jbr-api:SNAPSHOT")
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
 
 val nativeDir: String = file("${projectDir}/native").absolutePath
@@ -71,26 +65,9 @@ tasks.register<JavaExec>("run") {
     group = "application"
     description = "Runs the main class of the application."
 
-    // Define the main class to execute
-    mainClass.set("org.example.Main") // Replace `com.example.Main` with your actual main class
+    mainClass.set("org.example.Main")
 
-    // Include the runtime classpath
     classpath = sourceSets["main"].runtimeClasspath
 
-    // Optional: Pass JVM arguments (if needed)
-    jvmArgs = listOf("-Djava.library.path=${buildNativeDir}") // Example JVM options (optional)
-}
-
-tasks.register<JavaExec>("runXint") {
-    group = "application"
-    description = "Runs the main class of the application."
-
-    // Define the main class to execute
-    mainClass.set("org.example.Main") // Replace `com.example.Main` with your actual main class
-
-    // Include the runtime classpath
-    classpath = sourceSets["main"].runtimeClasspath
-
-    // Optional: Pass JVM arguments (if needed)
-    jvmArgs = listOf("-Djava.library.path=${buildNativeDir}", "-Xint") // Example JVM options (optional)
+    jvmArgs = (project.findProperty("org.gradle.jvmargs")?.toString()?.split(" ") ?: emptyList()) + "-Djava.library.path=${buildNativeDir}"
 }
