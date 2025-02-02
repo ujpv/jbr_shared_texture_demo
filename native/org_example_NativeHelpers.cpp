@@ -1,7 +1,14 @@
 #include <jni.h>
 
-#include "metal_utils.h"
 #include "org_example_NativeHelpers.h"
+
+#if __APPLE__
+#include "metal_utils.h"
+#elif _WIN32
+// not supported yet
+#elif __linux__
+#endif
+
 
 #include <iostream>
 
