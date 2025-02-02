@@ -42,6 +42,11 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             ${IO_SURFACE_FRAMEWORK}
             ${CORE_GRAPHICS_FRAMEWORK}
     )
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    list(APPEND SOURCES
+            linux_utils.h
+            linux_utils.cpp
+    )
 else ()
     message(FATAL_ERROR "${CMAKE_SYSTEM_NAME} is not supported")
 endif ()

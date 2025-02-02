@@ -7,6 +7,7 @@
 #elif _WIN32
 // not supported yet
 #elif __linux__
+#include "linux_utils.h"
 #endif
 
 
