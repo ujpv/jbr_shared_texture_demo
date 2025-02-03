@@ -1,3 +1,5 @@
+import org.gradle.api.GradleException
+
 plugins {
     id("java")
     id("cpp")
@@ -18,6 +20,15 @@ dependencies {
 val nativeDir: String = file("${projectDir}/native").absolutePath
 val buildNativeDir: String = layout.buildDirectory.dir("native").get().asFile.absolutePath
 
+// Retrieve CMake path from properties (default to "cmake" if not provided)
+val cmakePath: String = project.findProperty("cmake.path")?.toString() ?: "cmake"
+
+// Validate the CMake path—ensure it exists
+if (!exec {
+        commandLine = listOf(cmakePath, "--version")
+        isIgnoreExitValue = true  // Ignore failure for validation purpose
+    }.exitValue.toInt().equals(0)) throw GradleException("CMake not found at path: $cmakePath. Set the correct 'cmake.path' property in gradle.properties.")
+
 tasks.withType<JavaCompile> {
     options.compilerArgs.addAll(listOf("-h", nativeDir))
 }
@@ -26,9 +37,9 @@ tasks.register("checkNative") {
     doLast {
         println("Sources dir: $buildNativeDir")
         println("Build dir: $buildNativeDir")
-        println("Checking if CMake is installed...")
+        println("Checking if CMake is available...")
         exec {
-            commandLine = listOf("cmake", "--version")
+            commandLine = listOf(cmakePath, "--version")
         }
     }
 }
@@ -36,9 +47,9 @@ tasks.register("checkNative") {
 tasks.register("configureNative") {
     dependsOn("compileJava", "checkNative")
     doLast {
-        println("Configuring native build using CMake...")
+        println("Configuring native build using CMake at $cmakePath...")
         exec {
-            commandLine = listOf("cmake", "-DCMAKE_BUILD_TYPE=Debug", "-S", nativeDir, "-B", buildNativeDir)
+            commandLine = listOf(cmakePath, "-DCMAKE_BUILD_TYPE=Debug", "-S", nativeDir, "-B", buildNativeDir)
         }
     }
 }
@@ -46,9 +57,9 @@ tasks.register("configureNative") {
 tasks.register("buildNative") {
     dependsOn("configureNative")
     doLast {
-        println("Building native...")
+        println("Building native using CMake at $cmakePath...")
         exec {
-            commandLine = listOf("cmake", "--build", buildNativeDir, "--config", "Debug")
+            commandLine = listOf(cmakePath, "--build", buildNativeDir, "--config", "Debug")
         }
     }
 }
