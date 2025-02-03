@@ -78,5 +78,5 @@ tasks.register<JavaExec>("run") {
 
     classpath = sourceSets["main"].runtimeClasspath
 
-    jvmArgs = (project.findProperty("org.gradle.jvmargs")?.toString()?.split(" ") ?: emptyList()) + "-Djava.library.path=${buildNativeDir}"
+    jvmArgs = (project.findProperty("org.gradle.jvmargs")?.toString()?.split(" ") ?: emptyList()) + "-Djava.library.path=${buildNativeDir}/Debug"
 }

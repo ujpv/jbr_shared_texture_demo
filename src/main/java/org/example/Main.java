@@ -42,53 +42,60 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        String filename = "data/simple_shapes_example.png";
+        NativeHelpers.releaseD3D12Texture(0);
 
-        BufferedImage originalImage = ImageIO.read(new File(filename));
-        long nativeTexture = loadTexture(filename);
+        System.err.println("My PID: " + ProcessHandle.current().pid());
+        String filename = "C:\\develop\\jbr_shared_texture_demo\\data\\simple_shapes_example.png";
+        long handle = NativeHelpers.loadD3D12TextureFromPNG(filename);
+        System.err.println(NativeHelpers.saveD3D12TextureToPNG("C:\\develop\\jbr_shared_texture_demo\\data\\copy.png", handle));
+        NativeHelpers.releaseD3D12Texture(handle);
 
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Texture Renderer");
-            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosed(WindowEvent e) {
-                    releaseTexture(nativeTexture);
-                }
-            });
-            frame.setResizable(false);
-            frame.setVisible(true);
 
-            JPanel panel = new JPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-
-            ComponentAdapter onResize = new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    panel.revalidate();
-                    panel.repaint();
-                    frame.pack();
-                }
-            };
-
-            ImagePanel originalImagePanel = new ImagePanel(originalImage, "Original Image");
-            originalImagePanel.addComponentListener(onResize);
-            panel.add(originalImagePanel);
-
-            TexturePanel texturePanel = new TexturePanel(nativeTexture, "Texture");
-            texturePanel.addComponentListener(onResize);
-            panel.add(texturePanel);
-
-            TextureToBufferedImagePanel textureToBufferedImagePanel = new TextureToBufferedImagePanel(nativeTexture, "Texture->BufImage");
-            textureToBufferedImagePanel.addComponentListener(onResize);
-            panel.add(textureToBufferedImagePanel);
-
-            TextureToVolatileImage textureToVolatileImagePanel = new TextureToVolatileImage(nativeTexture, "Texture->VolImage");
-            textureToVolatileImagePanel.addComponentListener(onResize);
-            panel.add(textureToVolatileImagePanel);
-
-            frame.add(panel);
-            frame.pack();
-        });
+//        BufferedImage originalImage = ImageIO.read(new File(filename));
+//        long nativeTexture = loadTexture(filename);
+//
+//        SwingUtilities.invokeLater(() -> {
+//            JFrame frame = new JFrame("Texture Renderer");
+//            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//            frame.addWindowListener(new WindowAdapter() {
+//                @Override
+//                public void windowClosed(WindowEvent e) {
+//                    releaseTexture(nativeTexture);
+//                }
+//            });
+//            frame.setResizable(false);
+//            frame.setVisible(true);
+//
+//            JPanel panel = new JPanel();
+//            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+//
+//            ComponentAdapter onResize = new ComponentAdapter() {
+//                @Override
+//                public void componentResized(ComponentEvent e) {
+//                    panel.revalidate();
+//                    panel.repaint();
+//                    frame.pack();
+//                }
+//            };
+//
+//            ImagePanel originalImagePanel = new ImagePanel(originalImage, "Original Image");
+//            originalImagePanel.addComponentListener(onResize);
+//            panel.add(originalImagePanel);
+//
+//            TexturePanel texturePanel = new TexturePanel(nativeTexture, "Texture");
+//            texturePanel.addComponentListener(onResize);
+//            panel.add(texturePanel);
+//
+//            TextureToBufferedImagePanel textureToBufferedImagePanel = new TextureToBufferedImagePanel(nativeTexture, "Texture->BufImage");
+//            textureToBufferedImagePanel.addComponentListener(onResize);
+//            panel.add(textureToBufferedImagePanel);
+//
+//            TextureToVolatileImage textureToVolatileImagePanel = new TextureToVolatileImage(nativeTexture, "Texture->VolImage");
+//            textureToVolatileImagePanel.addComponentListener(onResize);
+//            panel.add(textureToVolatileImagePanel);
+//
+//            frame.add(panel);
+//            frame.pack();
+//        });
     }
 }

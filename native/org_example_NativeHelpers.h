@@ -121,6 +121,30 @@ JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_getTextureFromVolatileIma
 
 /*
  * Class:     org_example_NativeHelpers
+ * Method:    loadD3D12TextureFromPNG
+ * Signature: (Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_loadD3D12TextureFromPNG
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    releaseD3D12Texture
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_example_NativeHelpers_releaseD3D12Texture
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    saveD3D12TextureToPNG
+ * Signature: (Ljava/lang/String;J)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_saveD3D12TextureToPNG
+  (JNIEnv *, jclass, jstring, jlong);
+
+/*
+ * Class:     org_example_NativeHelpers
  * Method:    RenderQueueFlushAndInvokeNow
  * Signature: (Ljava/lang/Runnable;)V
  */

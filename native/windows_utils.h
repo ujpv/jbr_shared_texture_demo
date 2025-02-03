@@ -21,6 +21,10 @@ namespace platform_utils {
     jbyteArray MTLTextureToByteArray(JNIEnv *env, jlong ptr);
     std::pair<int, int> getMTLTextureSize(JNIEnv *env, jlong ptr);
 
+    jlong loadD3D12TextureFromPNG(JNIEnv *env, const std::string& filename);
+    bool saveD3D12TextureToPNG(JNIEnv *env, const std::string& filename, jlong handle);
+    void releaseD3D12Texture(JNIEnv *env, jlong handle);
+
     jlong getTextureFromVolatileImage(JNIEnv *env, jobject vi);
     void releaseOpenGLTexture(JNIEnv *env, jlong texture);
 }

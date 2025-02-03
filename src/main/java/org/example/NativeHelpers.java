@@ -49,6 +49,10 @@ public class NativeHelpers {
 
     public static native long getTextureFromVolatileImage(VolatileImage image);
 
+    public static native long loadD3D12TextureFromPNG(String filename);
+    public static native void releaseD3D12Texture(long texture);
+    public static native boolean saveD3D12TextureToPNG(String path, long texture);
+
     /**
      * Performs this code
      *     MTLRenderQueue rq = MTLRenderQueue.getInstance();

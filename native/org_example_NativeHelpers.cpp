@@ -144,4 +144,16 @@ extern "C" void Java_org_example_NativeHelpers_releaseOpenGLTexture(JNIEnv *env,
 
 }
 
+extern "C" jlong Java_org_example_NativeHelpers_loadD3D12TextureFromPNG(JNIEnv *env, jclass, jstring path) {
+    return platform_utils::loadD3D12TextureFromPNG(env, env->GetStringUTFChars(path, nullptr) );
+}
+
+extern "C" void Java_org_example_NativeHelpers_releaseD3D12Texture(JNIEnv *env, jclass, jlong handle) {
+    platform_utils::releaseD3D12Texture(env, handle);
+}
+
+extern "C" jboolean Java_org_example_NativeHelpers_saveD3D12TextureToPNG(JNIEnv * env, jclass, jstring path, jlong handle) {
+    return platform_utils::saveD3D12TextureToPNG(env, env->GetStringUTFChars(path, nullptr), handle);
+}
+
 
