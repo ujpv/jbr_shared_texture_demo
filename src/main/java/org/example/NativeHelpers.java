@@ -51,7 +51,10 @@ public class NativeHelpers {
 
     public static native long loadD3D12TextureFromPNG(String filename);
     public static native void releaseD3D12Texture(long texture);
-    public static native boolean saveD3D12TextureToPNG(String path, long texture);
+    public static native boolean saveD3D12TextureToPNG(String path, long handle);
+    public static native long getD3D9TextureFromSharedHandle(long handle);
+    public static native void releaseD3D9Texture(long handle);
+    public static native boolean saveD3D9TextureToPNG(String path, long texture);
 
     /**
      * Performs this code

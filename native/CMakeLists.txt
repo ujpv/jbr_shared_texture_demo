@@ -82,6 +82,7 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     )
 
     list(APPEND FRAMEWORKS
+            d3d9
             d3d12
             dxgi
             dxguid
@@ -99,4 +100,3 @@ if (INCLUDE_DIRS)
     message(STATUS "Include directories: ${INCLUDE_DIRS}")
     target_include_directories(native_helpers PRIVATE ${INCLUDE_DIRS})
 endif()
-

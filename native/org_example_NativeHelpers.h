@@ -145,6 +145,30 @@ JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_saveD3D12TextureToPNG
 
 /*
  * Class:     org_example_NativeHelpers
+ * Method:    getD3D9TextureFromSharedHandle
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_getD3D9TextureFromSharedHandle
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    releaseD3D9Texture
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_example_NativeHelpers_releaseD3D9Texture
+  (JNIEnv *env, jclass, jlong texture);
+
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    saveD3D9TextureToPNG
+ * Signature: (Ljava/lang/String;J)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_saveD3D9TextureToPNG
+  (JNIEnv *env, jclass, jstring path, jlong texture);
+
+/*
+ * Class:     org_example_NativeHelpers
  * Method:    RenderQueueFlushAndInvokeNow
  * Signature: (Ljava/lang/Runnable;)V
  */

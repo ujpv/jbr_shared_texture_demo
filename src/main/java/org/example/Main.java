@@ -48,6 +48,11 @@ public class Main {
         String filename = "C:\\develop\\jbr_shared_texture_demo\\data\\simple_shapes_example.png";
         long handle = NativeHelpers.loadD3D12TextureFromPNG(filename);
         System.err.println(NativeHelpers.saveD3D12TextureToPNG("C:\\develop\\jbr_shared_texture_demo\\data\\copy.png", handle));
+
+        long d3D9TextureFromSharedHandle = NativeHelpers.getD3D9TextureFromSharedHandle(handle);
+        NativeHelpers.saveD3D9TextureToPNG("C:\\develop\\jbr_shared_texture_demo\\data\\copy_d3d9.png", d3D9TextureFromSharedHandle);
+        NativeHelpers.releaseD3D9Texture(d3D9TextureFromSharedHandle);
+
         NativeHelpers.releaseD3D12Texture(handle);
 
 
