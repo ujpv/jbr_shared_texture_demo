@@ -47,6 +47,11 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
             linux_utils.h
             linux_utils.cpp
     )
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    list(APPEND SOURCES
+            windows_utils.h
+            windows_utils.cpp
+    )
 else ()
     message(FATAL_ERROR "${CMAKE_SYSTEM_NAME} is not supported")
 endif ()

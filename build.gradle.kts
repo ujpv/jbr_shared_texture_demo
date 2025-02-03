@@ -20,14 +20,12 @@ dependencies {
 val nativeDir: String = file("${projectDir}/native").absolutePath
 val buildNativeDir: String = layout.buildDirectory.dir("native").get().asFile.absolutePath
 
-// Retrieve CMake path from properties (default to "cmake" if not provided)
 val cmakePath: String = project.findProperty("cmake.path")?.toString() ?: "cmake"
 
-// Validate the CMake path—ensure it exists
-if (!exec {
+if (exec {
         commandLine = listOf(cmakePath, "--version")
-        isIgnoreExitValue = true  // Ignore failure for validation purpose
-    }.exitValue.toInt().equals(0)) throw GradleException("CMake not found at path: $cmakePath. Set the correct 'cmake.path' property in gradle.properties.")
+        isIgnoreExitValue = true
+    }.exitValue.toInt() != 0) throw GradleException("CMake not found at path: $cmakePath. Set the correct 'cmake.path' property in gradle.properties.")
 
 tasks.withType<JavaCompile> {
     options.compilerArgs.addAll(listOf("-h", nativeDir))

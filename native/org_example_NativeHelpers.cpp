@@ -5,7 +5,7 @@
 #if __APPLE__
 #include "metal_utils.h"
 #elif _WIN32
-// not supported yet
+#include "windows_utils.h"
 #elif __linux__
 #include "linux_utils.h"
 #endif
