@@ -92,13 +92,13 @@ namespace platform_utils {
                 return JNI_FALSE; // Return failure
             }
 
-            // Create the render pipeline descriptor
+            // Create render pipeline descriptor
             MTLRenderPipelineDescriptor *pipelineDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
             pipelineDescriptor.vertexFunction = [library newFunctionWithName:@"vertex_main"];
             pipelineDescriptor.fragmentFunction = [library newFunctionWithName:@"fragment_main"];
             pipelineDescriptor.colorAttachments[0].pixelFormat = texture.pixelFormat;
 
-            // Create the render pipeline state
+            // Create render pipeline state
             id<MTLRenderPipelineState> pipelineState = [device newRenderPipelineStateWithDescriptor:pipelineDescriptor error:&error];
             if (!pipelineState) {
                 NSLog(@"Failed to create pipeline state: %@", error.localizedDescription);
