@@ -1,3 +1,4 @@
+#define D3D_DEBUG_INFO
 #include "windows_utils.h"
 
 #include <d3d12.h>
@@ -122,7 +123,7 @@ namespace platform_utils {
         textureDesc.Height = static_cast<UINT>(height);
         textureDesc.DepthOrArraySize = 1;
         textureDesc.MipLevels = 1;
-        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // Matches D3DFMT_A8R8G8B8
+        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         textureDesc.SampleDesc.Count = 1;
         textureDesc.SampleDesc.Quality = 0;
         textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -130,7 +131,7 @@ namespace platform_utils {
         textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS;
 
         // Create a shared heap for the texture
-        const CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);
+        const CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT, 0, D3D12_HEAP_FLAG_SHARED);
 
         Microsoft::WRL::ComPtr<ID3D12Resource> texture;
         hr = device->CreateCommittedResource(
@@ -393,18 +394,18 @@ namespace platform_utils {
                 D3DPRESENT_PARAMETERS d3dpp = {};
                 d3dpp.Windowed = TRUE;                    // Windowed mode
                 d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD; // Discard swap chain frames after presenting
-                d3dpp.BackBufferCount = 1;               // Single back-buffer
+                d3dpp.BackBufferCount = 1;               // Single back buffer
                 d3dpp.BackBufferFormat = D3DFMT_UNKNOWN; // Use desktop display format
-                d3dpp.BackBufferWidth = 1;               // Dummy width (not rendering to a window)
-                d3dpp.BackBufferHeight = 1;              // Dummy height
-                d3dpp.Flags = D3DPRESENTFLAG_DEVICECLIP;
+                d3dpp.BackBufferWidth = 300;               // Dummy width
+                d3dpp.BackBufferHeight = 300;              // Dummy height
+                d3dpp.Flags = 0; // Removed D3DPRESENTFLAG_DEVICECLIP since it's not needed for offscreen use.
 
                 // Create the Direct3D9Ex device
                 HRESULT hr = g_d3d9Ex->CreateDeviceEx(
                         D3DADAPTER_DEFAULT,                  // Use the default D3D adapter
                         D3DDEVTYPE_HAL,                      // Use hardware acceleration
                         GetDesktopWindow(),                  // Use desktop window as target
-                        D3DCREATE_SOFTWARE_VERTEXPROCESSING, // Enable software vertex processing
+                        D3DCREATE_HARDWARE_VERTEXPROCESSING, // Use hardware vertex processing (important for shared textures)
                         &d3dpp,
                         nullptr,                             // No full-screen swap chain
                         &g_d3d9ExDevice                      // Pointer to the new D3D9Ex device
