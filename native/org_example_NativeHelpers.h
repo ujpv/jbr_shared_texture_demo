@@ -9,171 +9,27 @@ extern "C" {
 #endif
 /*
  * Class:     org_example_NativeHelpers
- * Method:    loadIOSurfaceFromPNG
+ * Method:    renderTriangleToMTLTexture
+ * Signature: (J)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_renderTriangleToMTLTexture
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_NativeHelpers
+ * Method:    loadBitmapFromPNG
  * Signature: (Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_loadIOSurfaceFromPNG
+JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_loadBitmapFromPNG
   (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     org_example_NativeHelpers
- * Method:    getMTLTextureFromIOSurface
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_getMTLTextureFromIOSurface
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    getOpenGLTextureFromIOSurface
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_getOpenGLTextureFromIOSurface
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    loadMTLTextureFromPNG
- * Signature: (Ljava/lang/String;)J
- */
-JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_loadMTLTextureFromPNG
-  (JNIEnv *, jclass, jstring);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    getMTLTextureSize
- * Signature: (J)Ljava/awt/Dimension;
- */
-JNIEXPORT jobject JNICALL Java_org_example_NativeHelpers_getMTLTextureSize
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    MTLTextureToByteArray
- * Signature: (J)[B
- */
-JNIEXPORT jbyteArray JNICALL Java_org_example_NativeHelpers_MTLTextureToByteArray
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    scaleMTLTexture
- * Signature: (JJD)Z
- */
-JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_scaleMTLTexture
-  (JNIEnv *, jclass, jlong, jlong, jdouble);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    copyMTLTexture
- * Signature: (JJ)Z
- */
-JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_copyMTLTexture
-  (JNIEnv *, jclass, jlong, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    releaseMTLTexture
+ * Method:    releaseBitmapFromJPG
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_example_NativeHelpers_releaseMTLTexture
+JNIEXPORT void JNICALL Java_org_example_NativeHelpers_releaseBitmapFromJPG
   (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    loadOpenGLTextureFromPNG
- * Signature: (Ljava/lang/String;)J
- */
-JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_loadOpenGLTextureFromPNG
-  (JNIEnv *, jclass, jstring);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    createOpenGLContext
- * Signature: (JJ)V
- */
-JNIEXPORT void JNICALL Java_org_example_NativeHelpers_createOpenGLContext
-  (JNIEnv *, jclass, jlong, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    saveOpenGLTextureToPNG
- * Signature: (JLjava/lang/String;)Z
- */
-JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_saveOpenGLTextureToPNG
-  (JNIEnv *, jclass, jlong, jstring);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    releaseOpenGLTexture
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_org_example_NativeHelpers_releaseOpenGLTexture
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    getTextureFromVolatileImage
- * Signature: (Ljava/awt/image/VolatileImage;)J
- */
-JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_getTextureFromVolatileImage
-  (JNIEnv *, jclass, jobject);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    loadD3D12TextureFromPNG
- * Signature: (Ljava/lang/String;)J
- */
-JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_loadD3D12TextureFromPNG
-  (JNIEnv *, jclass, jstring);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    releaseD3D12Texture
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_org_example_NativeHelpers_releaseD3D12Texture
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    saveD3D12TextureToPNG
- * Signature: (Ljava/lang/String;J)Z
- */
-JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_saveD3D12TextureToPNG
-  (JNIEnv *, jclass, jstring, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    getD3D9TextureFromSharedHandle
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL Java_org_example_NativeHelpers_getD3D9TextureFromSharedHandle
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    releaseD3D9Texture
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_org_example_NativeHelpers_releaseD3D9Texture
-  (JNIEnv *env, jclass, jlong texture);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    saveD3D9TextureToPNG
- * Signature: (Ljava/lang/String;J)Z
- */
-JNIEXPORT jboolean JNICALL Java_org_example_NativeHelpers_saveD3D9TextureToPNG
-  (JNIEnv *env, jclass, jstring path, jlong texture);
-
-/*
- * Class:     org_example_NativeHelpers
- * Method:    RenderQueueFlushAndInvokeNow
- * Signature: (Ljava/lang/Runnable;)V
- */
-JNIEXPORT void JNICALL Java_org_example_NativeHelpers_RenderQueueFlushAndInvokeNow
-  (JNIEnv *, jclass, jobject);
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,7 @@
 #include <MetalKit/MetalKit.h>
 #include <MetalPerformanceShaders/MetalPerformanceShaders.h>
 #include <QuartzCore/CAMetalLayer.h>
+#include <ImageIO/ImageIO.h>
 #include <AppKit/NSBitmapImageRep.h>
 
 #include <OpenGL/gl3.h>
@@ -48,8 +49,8 @@ namespace platform_utils {
         passDescriptor.colorAttachments[0].texture = texture;
         passDescriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
 
-        // Set clear color with transparency (alpha channel = 0 for transparency)
-        passDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 0.0); // RGBA: fully transparent
+        // Set clear color with transparency (alpha = 0)
+        passDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 0.0); // Fully transparent
         passDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
 
         // Start a new command buffer
@@ -66,7 +67,7 @@ namespace platform_utils {
             return JNI_FALSE; // Failure
         }
 
-        // Setup shaders, vertex data, and render a triangle
+        // Setup shaders and render pipeline
         {
             // Metal shader source code
             NSString *shaderSource = @"\
@@ -79,7 +80,7 @@ namespace platform_utils {
             vertex Vertex vertex_main(const device float4* vertices [[ buffer(0) ]], uint vertexID [[ vertex_id ]]) {\n\
                 Vertex out;\n\
                 out.position = vertices[vertexID];\n\
-                out.color = float4(vertices[vertexID].xyz, 1.0);\n\
+                out.color = float4(1.0, 0.0, 0.0, 1.0); // Red color\n\
                 return out;\n\
             }\n\
             fragment float4 fragment_main(Vertex in [[stage_in]]) {\n\
@@ -112,11 +113,16 @@ namespace platform_utils {
             // Set the pipeline state
             [renderEncoder setRenderPipelineState:pipelineState];
 
-            // Define vertex data for a triangle
+            // Calculate aspect ratio to transform the triangle and center it within the texture dimensions
+            float textureWidth = (float)texture.width;
+            float textureHeight = (float)texture.height;
+            float aspectRatio = textureWidth / textureHeight;
+
+            // Define vertex data for a triangle (positions are scaled and centered)
             const float vertexData[] = {
-                0.0f,  1.0f, 0.0f, 1.0f, // Top vertex
-               -1.0f, -1.0f, 0.0f, 1.0f, // Bottom-left vertex
-                1.0f, -1.0f, 0.0f, 1.0f  // Bottom-right vertex
+                0.0f,  0.5f / aspectRatio, 0.0f, 1.0f, // Top vertex (centered at the top middle of texture)
+               -0.5f, -0.5f / aspectRatio, 0.0f, 1.0f, // Bottom-left vertex
+                0.5f, -0.5f / aspectRatio, 0.0f, 1.0f  // Bottom-right vertex
             };
 
             // Create a Metal buffer for the vertex data
@@ -136,9 +142,101 @@ namespace platform_utils {
         [commandBuffer commit];
         [commandBuffer waitUntilCompleted];
 
-        // Successful completion
+        // Completed successfully
         return JNI_TRUE;
     }
 
+    jlong loadBitmapFromPNG(const std::string& path) {
+        // Create a CFString from the file path
+        CFStringRef cfPath = CFStringCreateWithCString(nullptr, path.c_str(), kCFStringEncodingUTF8);
+        if (!cfPath) {
+            NSLog(@"Failed to create CFString for file path.");
+            return 0;
+        }
 
+        // Create a CFURL from the CFString
+        CFURLRef url = CFURLCreateWithFileSystemPath(nullptr, cfPath, kCFURLPOSIXPathStyle, false);
+        CFRelease(cfPath); // Release CFString as it is no longer needed
+        if (!url) {
+            NSLog(@"Failed to create CFURL for file path.");
+            return 0;
+        }
+
+        // Create an image source from the file URL
+        CGImageSourceRef imageSource = CGImageSourceCreateWithURL(url, nullptr);
+        CFRelease(url); // Release CFURL as it is no longer needed
+        if (!imageSource) {
+            NSLog(@"Failed to create CGImageSource from URL.");
+            return 0;
+        }
+
+        // Load the first image in the file (index 0)
+        CGImageRef image = CGImageSourceCreateImageAtIndex(imageSource, 0, nullptr);
+        CFRelease(imageSource); // Release CGImageSource as it is no longer needed
+        if (!image) {
+            NSLog(@"Failed to create CGImage from image source.");
+            return 0;
+        }
+
+        // Get image width, height, and bytes per row
+        size_t width = CGImageGetWidth(image);
+        size_t height = CGImageGetHeight(image);
+        size_t bytesPerRow = width * 4; // Assuming RGBA format (4 bytes per pixel)
+
+        // Allocate memory for the bitmap data
+        void* bitmapData = malloc(bytesPerRow * height);
+        if (!bitmapData) {
+            NSLog(@"Failed to allocate memory for bitmap data.");
+            CGImageRelease(image);
+            return 0;
+        }
+
+        // Create a color space
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        if (!colorSpace) {
+            NSLog(@"Failed to create color space.");
+            free(bitmapData);
+            CGImageRelease(image);
+            return 0;
+        }
+
+        // Create a bitmap context
+        CGContextRef context = CGBitmapContextCreate(bitmapData, width, height, 8, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+        CGColorSpaceRelease(colorSpace); // Release color space as it is no longer needed
+        if (!context) {
+            NSLog(@"Failed to create CGContext.");
+            free(bitmapData);
+            CGImageRelease(image);
+            return 0;
+        }
+
+        // Log the image dimensions
+        NSLog(@"Successfully created CGContext. Image dimensions: %zu x %zu pixels", width, height);
+
+        // Draw the image into the context to populate the bitmap data
+        CGRect rect = CGRectMake(0, 0, width, height);
+        CGContextDrawImage(context, rect, image);
+        CGContextRelease(context); // Release the context
+        CGImageRelease(image);     // Release the image
+
+        // Log a success message
+        NSLog(@"Bitmap successfully loaded from path: %s", path.c_str());
+
+        // Return the pointer to the raw bitmap data
+        return reinterpret_cast<jlong>(bitmapData);
+    }
+
+    void releaseBitmap(jlong pBitmap) {
+        if (pBitmap == 0) {
+            NSLog(@"releaseBitmap: Received a null pointer. Nothing to release.");
+            return;
+        }
+
+        // Cast the jlong to a void* pointer
+        void* bitmapData = reinterpret_cast<void*>(pBitmap);
+
+        // Free the allocated memory
+        free(bitmapData);
+        NSLog(@"releaseBitmap: Bitmap memory at address %p has been successfully released.", bitmapData);
+    }
 }
