@@ -22,6 +22,7 @@ public class TextureToBufferedImagePanel extends BasePanel {
     protected void paintContent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         if (myGc != g2d.getDeviceConfiguration()) {
+            myGc = g2d.getDeviceConfiguration();
             myBufferedImage = createImage(myGc, myTexture);
             setSize(myBufferedImage.getWidth(), myBufferedImage.getHeight());
         }
