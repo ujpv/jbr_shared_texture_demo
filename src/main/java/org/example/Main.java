@@ -21,13 +21,6 @@ public class Main {
             case SharedTextures.MetalTextureType -> {
                 return NativeHelpers.loadMTLTextureFromPNG(filename);
             }
-            case SharedTextures.OpenGLTextureType -> {
-                NativeHelpers.createOpenGLContext(
-                        JBR.getSharedTextures().getSharedOpenGLContext(),
-                        JBR.getSharedTextures().getSharedOpenGLContextPixelFormat());
-
-                return NativeHelpers.loadOpenGLTextureFromPNG(filename);
-            }
             default -> throw new UnsupportedOperationException("Unexpected value: " + textureType);
         }
     }
@@ -36,7 +29,6 @@ public class Main {
         int textureType = JBR.getSharedTextures().getTextureType();
         switch (textureType) {
             case SharedTextures.MetalTextureType -> NativeHelpers.releaseMTLTexture(texture);
-            case SharedTextures.OpenGLTextureType -> NativeHelpers.releaseOpenGLTexture(texture);
             default -> throw new UnsupportedOperationException("Unexpected value: " + textureType);
         }
     }

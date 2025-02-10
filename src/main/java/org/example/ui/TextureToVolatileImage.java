@@ -34,15 +34,11 @@ public class TextureToVolatileImage extends BasePanel {
                     myVolatileImage = createVolatileImage(g2d.getDeviceConfiguration(), myTexture);
                     drawVolatileImage(g2d.getDeviceConfiguration(), myTexture, myVolatileImage);
                     setSize(myVolatileImage.getWidth(), myVolatileImage.getHeight());
-                    break;
                 case VolatileImage.IMAGE_RESTORED:
                     drawVolatileImage(g2d.getDeviceConfiguration(), myTexture, myVolatileImage);
-                    break;
-                case VolatileImage.IMAGE_OK:
-                    return;
             }
             g2d.drawImage(myVolatileImage, 0, 0, null);
-        } while (!myVolatileImage.contentsLost());
+        } while (myVolatileImage.contentsLost());
     }
 
     private static VolatileImage createVolatileImage(GraphicsConfiguration gc, long texture) {
